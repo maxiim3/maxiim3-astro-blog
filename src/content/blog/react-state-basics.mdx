@@ -1,0 +1,107 @@
+---
+title: "Using React's useState"
+description: "let's explore React's most used hook `useState`"
+pubDate: "May 17 2025"
+heroImage: "/react-banner.png"
+---
+
+import {
+  WrongCounter,
+  Counter,
+} from "../../components/react-ui/react-use-state.tsx";
+
+Let's explore React's most used and basic hook: `useState`
+
+## What is a state?
+
+**React** uses **Virtual-Dom** to update the UI with a process called **reconciliation** and **diffs**.
+In order to notify React there is an update, we must use the API provided by the Meta team.
+The state is a value tracked by React internally. It differs from how **Vuejs** or **Svelte** are tracking state.
+
+## State declaration
+
+`useState` is a function that takes an optional argument, the **initializer** and it returns an array _(actually its more like a tuple)_. A **good practice** is to destructure the array into `[state, setState]`.
+
+```tsx
+const [state, setState] = useState();
+```
+
+The first value is the **actual state**. The second is the method used to **update the state**.
+
+Note that we can _- and should-_ name the state that _meaningfully_ reflects the context.
+For example for a state representing everyone's favorite state `count`. We can also pass an **initial value** of `0`.
+
+```tsx
+const [count, setCount] = useState(0);
+// state = 0
+```
+
+## Updating the state
+
+So why can't we update `state` directly ?
+
+Even if we set the state to a mutable variable with `let`, we cannot update the state directly.
+That's because the state `count` is a **getter** while `setCount` is a **setter**.
+
+In order to illustrate, the code bellow won't work
+
+---
+
+<WrongCounter client:only="react" />
+
+```tsx
+export function WrongCounter() {
+  let [count, setCount] = useState(0);
+
+  return (
+    <>
+      <button onClick={() => (count += 1)}>Increment count</button>
+      <p>Count will stay {count} </p>
+    </>
+  );
+}
+```
+
+Here is how to update the state correctly:
+We can also use a `callback` inside the setter in order to access the current state:
+
+```tsx
+setCount(count + 1);
+setCount((prevCount) => prevCount + 1); // Same thing
+```
+
+Remember count is a `getter` value, so `useState(count++)` won't work properly.
+
+We can a reset button as well to our example:
+
+<Counter client:only="react" />
+
+```tsx
+export function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <>
+      <button onClick={() => setCount(count + 1)}>Increment count</button>
+      <button disabled={count === 0} onClick={() => setCount(0)}>
+        Reset count
+      </button>
+      <p>Count updates {count} </p>
+    </>
+  );
+}
+```
+
+## Conclusion
+
+Here are the basics of declaring, consuming and updating a react state.
+But **this is just the beginning**...
+
+We will dive deeper into **React's APIs** in the future.
+
+I will also write/compare with other framewok I use : **Vue.js** and **Svelte**.
+
+If you like this article don't hesitate to share it on social medias and tagg/follow me:
+
+- [𝕏/@max_webstudio](https://x.com/max_webstudio)
+- [🦋 bsky/@maxiim3.bsky.social](https://bsky.app/profile/maxiim3.bsky.social)
