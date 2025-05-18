@@ -19,21 +19,21 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
         max-width: 100%;
         margin: 0;
       }
-      /* .hero-image {
+      .hero-image {
         width: 100%;
       }
       .hero-image img {
         display: block;
         margin: 0 auto;
-        border-radius: 12px;
-        box-shadow: var(--box-shadow);
+        /* border-radius: 12px; */
+        /* box-shadow: var(--box-shadow); */
       }
       .prose {
         width: 720px;
         max-width: calc(100% - 2em);
         margin: auto;
         padding: 1em;
-        color: rgb(var(--gray-dark));
+        /* color: rgb(var(--gray-dark)); */
       }
       .title {
         margin-bottom: 1em;
@@ -46,11 +46,11 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
       }
       .date {
         margin-bottom: 0.5em;
-        color: rgb(var(--gray));
+        /* color: rgb(var(--gray)); */
       }
       .last-updated-on {
         font-style: italic;
-      } */
+      }
     </style>
   </head>
 
@@ -66,16 +66,14 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
                 height={510}
                 src={heroImage}
                 alt=""
-                class="mx-auto block rounded-xl shadow-[var(--box-shadow)]"
+                class="mx-auto block rounded-xl"
               />
             )
           }
         </div>
-        <div
-          class="prose mx-auto w-[720px] max-w-[calc(100%-2em)] p-[1em] text-[rgb(var(--gray-dark))]"
-        >
+        <div class="prose mx-auto w-[720px] max-w-[calc(100%-2em)] p-[1em]">
           <div class="title mb-[1em] px-0 py-[1em] text-center leading-none">
-            <div class="date mb-[0.5em] text-[rgb(var(--gray))]">
+            <div class="date mb-[0.5em]">
               <FormattedDate date={pubDate} />
               {
                 updatedDate && (
