@@ -1,0 +1,32 @@
+---
+title: "rebuilding useState"
+description: "let's explore React's most used hook `useState`"
+pubDate: "May 18 2025"
+heroImage: "/react-banner.png"
+---
+
+import { Page } from "../../components/react-ui/react-rebuild-use-state";
+
+In the previous article [ we introduced the fundamentals of React's useState](/blog/react-state-basics).
+
+In this article we assume you have basic knowledge of what React is, how JS works and how your HTML/CSS/JS code is transformed by the magical spirit of the browser [into a beautiful UI like this one](https://badhtml.com/).
+
+Let's dive now deeper in how it actually works.
+
+# What is a Virtual Dom ?
+
+The useState method is coupled to the Virtual Dom used by React.
+Vue.js uses a virtual DOM as well but it handles the state using mostly proxies.
+
+On the other side we cannot reproduce a useState behavior **without** actually mocking a virtual dom.
+
+# What the hell s the diffing and reconcilliation ?
+
+On first load, React will take your code and create a virtual copy of the actual DOM.
+
+<Page client:only="react" />
+
+If you like this article, don't hesitate to share it on social media and tag/follow me:
+
+- [𝕏/@max_webstudio](https://x.com/max_webstudio)
+- [🦋 bsky/@maxiim3.bsky.social](https://bsky.app/profile/maxiim3.bsky.social)
