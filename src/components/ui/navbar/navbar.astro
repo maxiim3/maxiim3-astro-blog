@@ -4,7 +4,9 @@ import { SITE_TITLE } from "../../../consts";
 import Logo from "./../../ui/atoms/logo-brand.astro";
 ---
 
-<header class="float-left border-r h-lvh p-2 flex flex-col">
+<header
+  class="float-left fixed border-r h-lvh p-2 sm:px-4 md:px-8 flex flex-col"
+>
   <nav>
     <h2>
       <a href="/">
@@ -12,7 +14,7 @@ import Logo from "./../../ui/atoms/logo-brand.astro";
         <span class="sr-only">{SITE_TITLE}</span>
       </a>
     </h2>
-    <div class="internal-links">
+    <div class="internal-links flex flex-col md:gap-8">
       <NavBarLink href="/">Home</NavBarLink>
       <NavBarLink href="/blog">Blog</NavBarLink>
       <NavBarLink href="/about">About</NavBarLink>
