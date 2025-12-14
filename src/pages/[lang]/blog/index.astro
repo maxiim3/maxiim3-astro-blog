@@ -1,0 +1,67 @@
+---
+/**
+ * Blog listing page with i18n support
+ * Displays all published blog posts as ArticleCards
+ * Sorted by date (newest first), filters out future posts
+ */
+import AppLayout from "../../../layouts/AppLayout.astro";
+import ArticleCard from "../../../components/blog/ArticleCard.astro";
+import { getCollection } from "astro:content";
+import {
+  useTranslations,
+  getLangFromUrl,
+  getI18nStaticPaths,
+  type Locale,
+} from "../../../i18n";
+
+export async function getStaticPaths() {
+  return getI18nStaticPaths((locale) => [
+    {
+      params: { lang: locale },
+    },
+  ]);
+}
+
+const lang = getLangFromUrl(Astro.url) as Locale;
+const t = useTranslations(lang);
+
+const today = new Date();
+
+// Get all blog posts, filter out future posts, sort by date (newest first)
+const posts = (await getCollection("blog"))
+  .filter((post) => post.data.pubDate.getTime() <= today.getTime())
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const pageTitle = t("blog.title");
+const pageDescription = t("blog.description");
+---
+
+<AppLayout title={pageTitle} description={pageDescription}>
+  <div class="p-6">
+    <!-- Page Header -->
+    <header class="mb-8">
+      <h1
+        class="text-4xl font-bold text-base-content mb-2"
+        style="font-family: 'Space Grotesk', sans-serif;"
+      >
+        {pageTitle}
+      </h1>
+      <p class="text-base-content/70 text-lg">{pageDescription}</p>
+    </header>
+
+    <!-- Blog Posts Feed (single column, style tweets) -->
+    {
+      posts.length > 0 ? (
+        <div class="flex flex-col divide-y divide-base-300">
+          {posts.map((post) => (
+            <ArticleCard post={post} lang={lang} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-base-content/60 text-lg">{t("blog.noPosts")}</p>
+        </div>
+      )
+    }
+  </div>
+</AppLayout>

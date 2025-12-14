@@ -1,0 +1,253 @@
+---
+/**
+ * CV Page with i18n support
+ * Interactive curriculum vitae page featuring:
+ * - Professional header with contact info
+ * - Experience timeline with visual gold accents
+ * - Skills grid with proficiency levels
+ * - Deep Space theme consistency
+ */
+import AppLayout from "../../layouts/AppLayout.astro";
+import CVHeader from "../../components/cv/CVHeader.astro";
+import Timeline, { type TimelineEntry } from "../../components/cv/Timeline.astro";
+import SkillsGrid, { type SkillCategory } from "../../components/cv/SkillsGrid.astro";
+import {
+  useTranslations,
+  getLangFromUrl,
+  getI18nStaticPaths,
+  type Locale,
+} from "../../i18n";
+
+export async function getStaticPaths() {
+  return getI18nStaticPaths((locale) => [
+    {
+      params: { lang: locale },
+    },
+  ]);
+}
+
+const lang = getLangFromUrl(Astro.url) as Locale;
+const t = useTranslations(lang);
+
+// Placeholder CV data - this can be moved to a data file or CMS later
+const cvData = {
+  name: t("home.name"),
+  title: t("home.title"),
+  tagline: t("home.tagline"),
+  contact: {
+    email: "maxime@example.com",
+    phone: "+1 (555) 123-4567",
+    location: "Paris, France",
+    website: "https://example.com",
+    linkedin: "https://linkedin.com/in/maxime",
+    github: "https://github.com/maxiim3",
+  },
+};
+
+// Experience timeline data
+const experienceData: TimelineEntry[] = [
+  {
+    company: "TechCorp",
+    role: lang === "en" ? "Front-end Lead" : "Lead Front-end",
+    startDate: "2022",
+    description:
+      lang === "en"
+        ? "Leading a team of front-end developers building scalable Vue.js applications. Architecting component libraries, establishing best practices, and mentoring junior developers."
+        : "Direction d'une équipe de développeurs front-end créant des applications Vue.js évolutives. Architecture de bibliothèques de composants, établissement des meilleures pratiques et mentorat de développeurs juniors.",
+    technologies: ["Vue 3", "TypeScript", "Vite", "Pinia", "Vitest"],
+  },
+  {
+    company: "WebAgency",
+    role: lang === "en" ? "Senior Developer" : "Développeur Senior",
+    startDate: "2020",
+    endDate: "2022",
+    description:
+      lang === "en"
+        ? "Developed high-performance React applications for enterprise clients. Implemented state management solutions, optimized bundle sizes, and conducted code reviews."
+        : "Développement d'applications React haute performance pour des clients entreprise. Mise en œuvre de solutions de gestion d'état, optimisation de la taille des bundles et révisions de code.",
+    technologies: ["React", "Redux", "Next.js", "TailwindCSS", "Jest"],
+  },
+  {
+    company: "Startup",
+    role: lang === "en" ? "Front-end Developer" : "Développeur Front-end",
+    startDate: "2018",
+    endDate: "2020",
+    description:
+      lang === "en"
+        ? "Full-stack JavaScript development with focus on modern web technologies. Built responsive SPAs, RESTful APIs, and implemented CI/CD pipelines."
+        : "Développement JavaScript full-stack avec un focus sur les technologies web modernes. Création de SPAs responsive, APIs RESTful et mise en place de pipelines CI/CD.",
+    technologies: ["Svelte", "Node.js", "Express", "MongoDB", "Docker"],
+  },
+];
+
+// Skills data organized by category
+const skillsData: SkillCategory[] = [
+  {
+    category: t("cv.categories.frameworks"),
+    skills: [
+      { name: "Vue.js", proficiency: 5 },
+      { name: "Svelte", proficiency: 5 },
+      { name: "React", proficiency: 4 },
+      { name: "Astro", proficiency: 4 },
+      { name: "SvelteKit", proficiency: 5 },
+      { name: "Nuxt", proficiency: 4 },
+    ],
+  },
+  {
+    category: t("cv.categories.languages"),
+    skills: [
+      { name: "TypeScript", proficiency: 5 },
+      { name: "JavaScript", proficiency: 5 },
+      { name: "HTML5", proficiency: 5 },
+      { name: "CSS3", proficiency: 5 },
+      { name: "Node.js", proficiency: 4 },
+      { name: "SQL", proficiency: 3 },
+    ],
+  },
+  {
+    category: t("cv.categories.tools"),
+    skills: [
+      { name: "Vite", proficiency: 5 },
+      { name: "TailwindCSS", proficiency: 5 },
+      { name: "Git", proficiency: 5 },
+      { name: "Docker", proficiency: 3 },
+      { name: "Vitest/Jest", proficiency: 4 },
+      { name: "XState", proficiency: 4 },
+    ],
+  },
+  {
+    category: t("cv.categories.practices"),
+    skills: [
+      { name: "Accessibility (A11y)", proficiency: 5 },
+      { name: "Performance Optimization", proficiency: 5 },
+      { name: "Responsive Design", proficiency: 5 },
+      { name: "Progressive Enhancement", proficiency: 4 },
+      { name: "Component Architecture", proficiency: 5 },
+      { name: "State Management", proficiency: 5 },
+    ],
+  },
+];
+
+const pageTitle = t("cv.title");
+const pageDescription = t("cv.description");
+---
+
+<AppLayout title={`${cvData.name} - ${pageTitle}`} description={pageDescription}>
+  <!-- CV Header -->
+  <CVHeader
+    lang={lang}
+    name={cvData.name}
+    title={cvData.title}
+    tagline={cvData.tagline}
+    contact={cvData.contact}
+  />
+
+  <!-- Experience Section -->
+  <section class="border-t border-base-300 px-6 py-12 md:px-8">
+    <h2
+      class="mb-8 text-3xl font-bold md:text-4xl"
+      style="font-family: 'Space Grotesk', sans-serif;"
+    >
+      {t("cv.experience")}
+    </h2>
+
+    <Timeline lang={lang} entries={experienceData} />
+  </section>
+
+  <!-- Skills Section -->
+  <section class="border-t border-base-300 px-6 py-12 md:px-8">
+    <h2
+      class="mb-8 text-3xl font-bold md:text-4xl"
+      style="font-family: 'Space Grotesk', sans-serif;"
+    >
+      {t("cv.skills")}
+    </h2>
+
+    <SkillsGrid lang={lang} categories={skillsData} />
+  </section>
+
+  <!-- Education Section (optional) -->
+  <section class="border-t border-base-300 px-6 py-12 md:px-8">
+    <h2
+      class="mb-8 text-3xl font-bold md:text-4xl"
+      style="font-family: 'Space Grotesk', sans-serif;"
+    >
+      {t("cv.education")}
+    </h2>
+
+    <div class="rounded-lg border border-base-300 bg-base-100 p-5 md:p-6">
+      <h3
+        class="mb-2 text-xl font-semibold md:text-2xl"
+        style="font-family: 'Space Grotesk', sans-serif;"
+      >
+        {
+          lang === "en"
+            ? "Bachelor of Computer Science"
+            : "Licence en Informatique"
+        }
+      </h3>
+      <div class="mb-3 flex items-center gap-2 text-base md:text-lg">
+        <span class="font-medium text-primary">
+          {lang === "en" ? "Tech University" : "Université Technologique"}
+        </span>
+        <span class="text-neutral" aria-hidden="true">•</span>
+        <time class="text-neutral">2014 - 2018</time>
+      </div>
+      <p class="leading-relaxed text-base-content/90">
+        {
+          lang === "en"
+            ? "Focused on software engineering, web technologies, and user interface design. Graduated with honors."
+            : "Spécialisation en génie logiciel, technologies web et conception d'interfaces utilisateur. Diplômé avec mention."
+        }
+      </p>
+    </div>
+  </section>
+
+  <!-- Call to Action / Footer -->
+  <section class="border-t border-base-300 px-6 py-12 md:px-8">
+    <div class="text-center">
+      <p class="mb-6 text-lg text-base-content/80">
+        {
+          lang === "en"
+            ? "Interested in working together? Let's connect!"
+            : "Intéressé par une collaboration ? Connectons-nous !"
+        }
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a
+          href={`mailto:${cvData.contact.email}`}
+          class="inline-flex items-center rounded-lg bg-primary px-6 py-3 font-semibold text-primary-content transition-all hover:scale-105 hover:shadow-lg"
+        >
+          {lang === "en" ? "Send Email" : "Envoyer un Email"}
+        </a>
+        <a
+          href={cvData.contact.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center rounded-lg border-2 border-primary px-6 py-3 font-semibold text-primary transition-all hover:scale-105 hover:bg-primary hover:text-primary-content"
+        >
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </section>
+</AppLayout>
+
+<style>
+  /* Print styles for potential PDF generation */
+  @media print {
+    .border-t {
+      page-break-inside: avoid;
+    }
+
+    section {
+      page-break-inside: avoid;
+    }
+
+    a[href]:after {
+      content: " (" attr(href) ")";
+      font-size: 0.8em;
+      color: oklch(var(--color-neutral));
+    }
+  }
+</style>

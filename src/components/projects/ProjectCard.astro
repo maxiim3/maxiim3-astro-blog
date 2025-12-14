@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatDate, type Locale } from "../../i18n";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+  lang: Locale;
+}
+
+const { project, lang } = Astro.props;
+const { title, description, pubDate, heroImage, stack } = project.data;
+const projectUrl = `/${lang}/projects/${project.id}/`;
+---
+
+<article class="transition-colors hover:bg-base-200/50">
+  <a href={projectUrl} class="block p-4">
+    <div class="flex gap-4">
+      {heroImage && (
+        <img
+          src={heroImage}
+          alt=""
+          class="w-16 h-16 rounded object-cover shrink-0"
+        />
+      )}
+      <div class="min-w-0">
+        <h2 class="font-semibold text-base-content">{title}</h2>
+        <p class="text-sm text-base-content/60 line-clamp-2">{description}</p>
+        {stack && stack.length > 0 && (
+          <div class="flex gap-1 mt-1">
+            {stack.map((tech) => (
+              <span class="text-xs text-base-content/50">{tech}</span>
+            ))}
+          </div>
+        )}
+        <time class="text-xs text-base-content/40">{formatDate(pubDate, lang)}</time>
+      </div>
+    </div>
+  </a>
+</article>
+
+<style>
+  a { color: inherit; text-decoration: none; }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

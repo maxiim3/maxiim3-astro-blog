@@ -1,0 +1,32 @@
+---
+import { getLangFromUrl, getAlternateLocale, translatePath } from "../../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const alternateLang = getAlternateLocale(lang);
+const alternateUrl = translatePath(Astro.url.pathname, alternateLang);
+---
+
+<div class="flex items-center">
+  <div class="join">
+    <a
+      href={lang === "en" ? "#" : translatePath(Astro.url.pathname, "en")}
+      class:list={[
+        "btn btn-sm join-item",
+        lang === "en" ? "btn-active" : ""
+      ]}
+      aria-current={lang === "en" ? "true" : undefined}
+    >
+      EN
+    </a>
+    <a
+      href={lang === "fr" ? "#" : translatePath(Astro.url.pathname, "fr")}
+      class:list={[
+        "btn btn-sm join-item",
+        lang === "fr" ? "btn-active" : ""
+      ]}
+      aria-current={lang === "fr" ? "true" : undefined}
+    >
+      FR
+    </a>
+  </div>
+</div>

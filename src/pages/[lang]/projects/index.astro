@@ -1,0 +1,67 @@
+---
+/**
+ * Projects listing page with i18n support
+ * Displays all published projects as ProjectCards
+ * Sorted by date (newest first), filters out future projects
+ */
+import AppLayout from "../../../layouts/AppLayout.astro";
+import ProjectCard from "../../../components/projects/ProjectCard.astro";
+import { getCollection } from "astro:content";
+import {
+  useTranslations,
+  getLangFromUrl,
+  getI18nStaticPaths,
+  type Locale,
+} from "../../../i18n";
+
+export async function getStaticPaths() {
+  return getI18nStaticPaths((locale) => [
+    {
+      params: { lang: locale },
+    },
+  ]);
+}
+
+const lang = getLangFromUrl(Astro.url) as Locale;
+const t = useTranslations(lang);
+
+const today = new Date();
+
+// Get all projects, filter out future projects, sort by date (newest first)
+const projects = (await getCollection("projects"))
+  .filter((project) => project.data.pubDate.getTime() <= today.getTime())
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const pageTitle = t("projects.title");
+const pageDescription = t("projects.description");
+---
+
+<AppLayout title={pageTitle} description={pageDescription}>
+  <div class="p-6">
+    <!-- Page Header -->
+    <header class="mb-8">
+      <h1
+        class="text-4xl font-bold text-base-content mb-2"
+        style="font-family: 'Space Grotesk', sans-serif;"
+      >
+        {pageTitle}
+      </h1>
+      <p class="text-base-content/70 text-lg">{pageDescription}</p>
+    </header>
+
+    <!-- Projects Feed (single column, style tweets) -->
+    {
+      projects.length > 0 ? (
+        <div class="flex flex-col divide-y divide-base-300">
+          {projects.map((project) => (
+            <ProjectCard project={project} lang={lang} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-base-content/60 text-lg">{t("projects.noProjects")}</p>
+        </div>
+      )
+    }
+  </div>
+</AppLayout>

@@ -1,0 +1,111 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+import type { Locale } from "../../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url) as Locale;
+const t = useTranslations(lang);
+
+// Generate static paths for all supported locales
+export async function getStaticPaths() {
+  return [
+    { params: { lang: "en" } },
+    { params: { lang: "fr" } },
+  ];
+}
+---
+
+<AppLayout
+  title={`${t("home.name")} - ${t("home.title")}`}
+  description={t("home.tagline")}
+>
+  <!-- Hero Section -->
+  <section class="px-6 py-16 md:px-8">
+    <div class="max-w-2xl">
+      <h1 class="mb-4 text-5xl font-bold tracking-tight md:text-6xl">
+        {t("home.name")}
+      </h1>
+
+      <p class="mb-6 text-xl font-medium text-primary md:text-2xl">
+        {t("home.title")}
+      </p>
+
+      <p class="mb-8 text-lg leading-relaxed opacity-90 md:text-xl">
+        {t("home.tagline")}
+      </p>
+    </div>
+  </section>
+
+  <!-- Bio Section -->
+  <section class="border-base-300 border-t px-6 py-12 md:px-8">
+    <div class="max-w-2xl space-y-6">
+      <p class="text-lg leading-relaxed">
+        {t("home.bio.intro")}
+      </p>
+
+      <p class="text-lg leading-relaxed">
+        {t("home.bio.focus")}
+      </p>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section class="border-base-300 border-t px-6 py-12 md:px-8">
+    <div class="max-w-2xl">
+      <h2 class="mb-8 text-3xl font-semibold">
+        {t("home.skills.title")}
+      </h2>
+
+      <div class="space-y-6">
+        <!-- Frameworks -->
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
+            Frameworks & Libraries
+          </h3>
+          <p class="text-lg">
+            {t("home.skills.frameworks")}
+          </p>
+        </div>
+
+        <!-- Tooling -->
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
+            Tooling & Technologies
+          </h3>
+          <p class="text-lg">
+            {t("home.skills.tooling")}
+          </p>
+        </div>
+
+        <!-- Practices -->
+        <div>
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
+            Best Practices
+          </h3>
+          <p class="text-lg">
+            {t("home.skills.practices")}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="border-base-300 border-t px-6 py-12 md:px-8">
+    <div class="flex flex-wrap gap-4">
+      <a
+        href={`/${lang}/blog`}
+        class="inline-flex items-center rounded-lg bg-primary px-6 py-3 font-semibold text-primary-content transition-all hover:scale-105 hover:shadow-lg"
+      >
+        {t("home.cta.blog")}
+      </a>
+
+      <a
+        href={`/${lang}/projects`}
+        class="border-primary text-primary hover:bg-primary hover:text-primary-content inline-flex items-center rounded-lg border-2 px-6 py-3 font-semibold transition-all hover:scale-105"
+      >
+        {t("home.cta.projects")}
+      </a>
+    </div>
+  </section>
+</AppLayout>

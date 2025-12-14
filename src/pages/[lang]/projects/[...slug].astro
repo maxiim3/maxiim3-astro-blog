@@ -1,0 +1,203 @@
+---
+/**
+ * Project detail page with i18n support
+ * Displays full project content with hero image, metadata, stack, and links
+ */
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import AppLayout from "../../../layouts/AppLayout.astro";
+import {
+  useTranslations,
+  getLangFromUrl,
+  getI18nStaticPaths,
+  formatDate,
+  type Locale,
+} from "../../../i18n";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return getI18nStaticPaths((locale) =>
+    projects.map((project) => ({
+      params: { lang: locale, slug: project.id },
+      props: { project },
+    }))
+  );
+}
+
+type Props = {
+  project: CollectionEntry<"projects">;
+};
+
+const { project } = Astro.props;
+const lang = getLangFromUrl(Astro.url) as Locale;
+const t = useTranslations(lang);
+
+const { Content } = await render(project);
+const { title, description, pubDate, heroImage, tags, stack, demoUrl, repoUrl } = project.data;
+const formattedDate = formatDate(pubDate, lang);
+---
+
+<AppLayout title={title} description={description}>
+  <article class="p-0">
+    <!-- Back link -->
+    <div class="p-4 border-b border-base-300">
+      <a
+        href={`/${lang}/projects`}
+        class="inline-flex items-center gap-2 text-base-content/70 hover:text-warning transition-colors duration-200"
+      >
+        <span aria-hidden="true">←</span>
+        <span>{t("common.back")}</span>
+      </a>
+    </div>
+
+    <!-- Hero Image -->
+    {
+      heroImage && (
+        <div class="w-full">
+          <img
+            src={heroImage}
+            alt={title}
+            class="w-full h-auto max-h-[400px] object-cover"
+          />
+        </div>
+      )
+    }
+
+    <!-- Project Header -->
+    <header class="p-6 border-b border-base-300">
+      <div class="max-w-3xl mx-auto">
+        <h1
+          class="text-4xl font-bold text-base-content mb-4"
+          style="font-family: 'Space Grotesk', sans-serif;"
+        >
+          {title}
+        </h1>
+        <p class="text-xl text-base-content/80 mb-4">{description}</p>
+
+        <!-- Metadata and Links -->
+        <div class="flex flex-wrap items-center gap-4 mb-4">
+          <time datetime={pubDate.toISOString()} class="text-sm text-base-content/60 flex items-center gap-1">
+            <span aria-hidden="true">📅</span>
+            <span>{formattedDate}</span>
+          </time>
+
+          <!-- Action Links -->
+          {
+            demoUrl && (
+              <a
+                href={demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-sm btn-warning"
+              >
+                <span aria-hidden="true">🚀</span>
+                {t("projects.viewProject")}
+              </a>
+            )
+          }
+          {
+            repoUrl && (
+              <a
+                href={repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-sm btn-outline"
+              >
+                <span aria-hidden="true">💻</span>
+                {t("projects.viewSource")}
+              </a>
+            )
+          }
+        </div>
+
+        <!-- Tech Stack -->
+        {
+          stack && stack.length > 0 && (
+            <div class="mb-4">
+              <h3 class="text-sm font-semibold text-base-content/70 mb-2">
+                Tech Stack
+              </h3>
+              <div class="flex flex-wrap gap-2">
+                {stack.map((tech) => (
+                  <span class="badge badge-primary badge-lg">{tech}</span>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <!-- Tags -->
+        {
+          tags && tags.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span class="badge badge-outline badge-lg">{tag}</span>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </header>
+
+    <!-- Project Content -->
+    <div class="prose prose-lg max-w-3xl mx-auto p-6">
+      <Content />
+    </div>
+
+    <!-- Back to projects link at bottom -->
+    <div class="p-6 border-t border-base-300">
+      <a
+        href={`/${lang}/projects`}
+        class="inline-flex items-center gap-2 text-base-content/70 hover:text-warning transition-colors duration-200"
+      >
+        <span aria-hidden="true">←</span>
+        <span>{t("projects.allProjects")}</span>
+      </a>
+    </div>
+  </article>
+</AppLayout>
+
+<style is:global>
+  /* Ensure prose styles work well with Deep Space theme */
+  .prose {
+    color: oklch(var(--bc));
+  }
+
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    color: oklch(var(--bc));
+    font-family: "Space Grotesk", sans-serif;
+  }
+
+  .prose a {
+    color: oklch(var(--wa));
+    text-decoration: underline;
+  }
+
+  .prose a:hover {
+    color: oklch(var(--wa) / 0.8);
+  }
+
+  .prose code {
+    background-color: oklch(var(--b2));
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+
+  .prose pre {
+    background-color: oklch(var(--b2));
+    border: 1px solid oklch(var(--bc) / 0.1);
+  }
+
+  .prose blockquote {
+    border-left-color: oklch(var(--wa));
+    color: oklch(var(--bc) / 0.8);
+  }
+
+  .prose img {
+    border-radius: 0.5rem;
+  }
+</style>

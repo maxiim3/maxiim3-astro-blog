@@ -15,6 +15,13 @@ export default defineConfig({
     },
   },
   site: "https://example.com",
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "fr"],
+    routing: {
+      prefixDefaultLocale: true,
+    },
+  },
   integrations: [
     mdx(),
     sitemap(),

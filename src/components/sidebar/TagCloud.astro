@@ -1,0 +1,238 @@
+---
+/**
+ * TagCloud component
+ * Displays all unique tags from blog and projects collections
+ * Tags are sized based on frequency and clickable to filter content
+ * Gold accent hover effect from Deep Space theme
+ */
+
+import { getCollection } from "astro:content";
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Get all content to extract tags
+const blogPosts = await getCollection("blog");
+const projects = await getCollection("projects");
+
+// Count tag frequency
+const tagFrequency = new Map<string, number>();
+
+// Process blog tags
+blogPosts.forEach((post) => {
+  if (post.data.tags) {
+    post.data.tags.forEach((tag) => {
+      const normalizedTag = tag.toLowerCase();
+      tagFrequency.set(normalizedTag, (tagFrequency.get(normalizedTag) || 0) + 1);
+    });
+  }
+});
+
+// Process project tags and stack
+projects.forEach((project) => {
+  if (project.data.tags) {
+    project.data.tags.forEach((tag) => {
+      const normalizedTag = tag.toLowerCase();
+      tagFrequency.set(normalizedTag, (tagFrequency.get(normalizedTag) || 0) + 1);
+    });
+  }
+  if (project.data.stack) {
+    project.data.stack.forEach((tech) => {
+      const normalizedTag = tech.toLowerCase();
+      tagFrequency.set(normalizedTag, (tagFrequency.get(normalizedTag) || 0) + 1);
+    });
+  }
+});
+
+// Convert to array and sort by frequency
+interface Tag {
+  name: string;
+  count: number;
+  size: "sm" | "md" | "lg";
+}
+
+const tags: Tag[] = Array.from(tagFrequency.entries())
+  .map(([name, count]) => {
+    // Determine size based on frequency
+    let size: "sm" | "md" | "lg" = "sm";
+    if (count >= 3) size = "lg";
+    else if (count >= 2) size = "md";
+
+    return { name, count, size };
+  })
+  .sort((a, b) => {
+    // Sort by count descending, then alphabetically
+    if (b.count !== a.count) return b.count - a.count;
+    return a.name.localeCompare(b.name);
+  });
+
+// Size classes for tags
+const sizeClasses = {
+  sm: "text-xs px-2 py-1",
+  md: "text-sm px-2.5 py-1",
+  lg: "text-base px-3 py-1.5 font-medium",
+};
+---
+
+<div class="tag-cloud-container rounded-lg bg-base-200 p-4">
+  <h3 class="text-sm font-semibold text-base-content/60 mb-3">
+    {t("sidebar.tags.title")}
+  </h3>
+
+  {
+    tags.length > 0 ? (
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <button
+            type="button"
+            data-tag={tag.name}
+            data-count={tag.count}
+            class:list={[
+              "tag-item rounded-full bg-base-300 text-base-content/70 transition-all duration-200",
+              "hover:bg-primary hover:text-primary-content hover:shadow-md",
+              "focus:outline-none focus:ring-2 focus:ring-primary/50",
+              "cursor-pointer",
+              sizeClasses[tag.size],
+            ]}
+            aria-label={`Filter by ${tag.name} (${tag.count} items)`}
+            title={`${tag.count} item${tag.count > 1 ? "s" : ""}`}
+          >
+            {tag.name}
+          </button>
+        ))}
+      </div>
+    ) : (
+      <p class="text-base-content/40 text-sm">No tags available</p>
+    )
+  }
+</div>
+
+<script>
+  /**
+   * Client-side tag filtering functionality
+   * Filters articles when tags are clicked
+   */
+
+  function initTagCloud() {
+    const tagButtons = document.querySelectorAll('[data-tag]');
+    if (!tagButtons.length) return;
+
+    let activeTag: string | null = null;
+
+    // Handle tag click
+    const handleTagClick = (e: Event) => {
+      const button = e.currentTarget as HTMLButtonElement;
+      const tagName = button.getAttribute('data-tag');
+      if (!tagName) return;
+
+      // Toggle tag selection
+      const isActive = activeTag === tagName;
+
+      // Reset all tags
+      tagButtons.forEach((btn) => {
+        btn.classList.remove('bg-primary', 'text-primary-content', 'shadow-md');
+        btn.classList.add('bg-base-300', 'text-base-content/70');
+      });
+
+      if (isActive) {
+        // Deselect tag - show all
+        activeTag = null;
+        filterArticlesByTag(null);
+      } else {
+        // Select new tag
+        activeTag = tagName;
+        button.classList.remove('bg-base-300', 'text-base-content/70');
+        button.classList.add('bg-primary', 'text-primary-content', 'shadow-md');
+        filterArticlesByTag(tagName);
+      }
+
+      // Dispatch custom event
+      window.dispatchEvent(
+        new CustomEvent('tag-filter', {
+          detail: { tag: activeTag }
+        })
+      );
+    };
+
+    // Filter articles by tag
+    const filterArticlesByTag = (tagName: string | null) => {
+      const articles = document.querySelectorAll('[data-article]');
+      let visibleCount = 0;
+
+      articles.forEach((article) => {
+        const tags = article.getAttribute('data-tags')?.toLowerCase() || '';
+        const stack = article.getAttribute('data-stack')?.toLowerCase() || '';
+        const allTags = `${tags} ${stack}`;
+
+        // Show all if no tag selected, otherwise filter
+        const matches = tagName === null || allTags.includes(tagName.toLowerCase());
+
+        if (matches) {
+          article.classList.remove('hidden', 'tag-hidden');
+          visibleCount++;
+        } else {
+          article.classList.add('hidden', 'tag-hidden');
+        }
+      });
+
+      // Update visible count
+      window.dispatchEvent(
+        new CustomEvent('tag-update', {
+          detail: { tag: tagName, visibleCount }
+        })
+      );
+    };
+
+    // Attach event listeners
+    tagButtons.forEach((button) => {
+      button.addEventListener('click', handleTagClick);
+    });
+
+    // Reset tag filter when other filters change
+    window.addEventListener('filter-change', () => {
+      if (activeTag) {
+        tagButtons.forEach((btn) => {
+          btn.classList.remove('bg-primary', 'text-primary-content', 'shadow-md');
+          btn.classList.add('bg-base-300', 'text-base-content/70');
+        });
+        activeTag = null;
+      }
+    });
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTagCloud);
+  } else {
+    initTagCloud();
+  }
+
+  // Re-initialize on page navigation (for view transitions)
+  document.addEventListener('astro:page-load', initTagCloud);
+</script>
+
+<style>
+  /* Tag hover effects */
+  .tag-item {
+    user-select: none;
+  }
+
+  .tag-item:hover {
+    transform: translateY(-2px);
+  }
+
+  .tag-item:active {
+    transform: translateY(0);
+  }
+
+  /* Active tag gets a gold glow */
+  .tag-item.bg-primary {
+    box-shadow: 0 2px 8px oklch(var(--color-primary) / 0.3);
+  }
+
+  /* Smooth size transitions */
+  .tag-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+</style>

@@ -1,0 +1,91 @@
+---
+/**
+ * Timeline Component
+ * Visual timeline for experience entries
+ * Features gold accent line and dots, responsive layout
+ */
+import { useTranslations, type Locale } from "../../i18n";
+
+export interface TimelineEntry {
+  company: string;
+  role: string;
+  startDate: string;
+  endDate?: string; // Optional - undefined means present
+  description: string;
+  technologies?: string[];
+}
+
+interface Props {
+  lang: Locale;
+  entries: TimelineEntry[];
+}
+
+const { lang, entries } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<div class="relative space-y-8">
+  <!-- Timeline vertical line (gold accent) -->
+  <div
+    class="absolute left-[7px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-primary via-primary to-transparent md:left-[9px]"
+    aria-hidden="true"
+  >
+  </div>
+
+  {
+    entries.map((entry, index) => (
+      <article class="relative pl-8 md:pl-10">
+        <!-- Timeline dot (gold) -->
+        <div
+          class="absolute left-0 top-1 h-4 w-4 rounded-full border-2 border-primary bg-base-100 md:h-5 md:w-5"
+          aria-hidden="true"
+        />
+
+        <!-- Timeline content card -->
+        <div class="group rounded-lg border border-base-300 bg-base-100 p-5 transition-all hover:border-primary/50 hover:shadow-lg md:p-6">
+          {/* Header: Role and Company */}
+          <div class="mb-3">
+            <h3
+              class="mb-1 text-xl font-semibold text-base-content md:text-2xl"
+              style="font-family: 'Space Grotesk', sans-serif;"
+            >
+              {entry.role}
+            </h3>
+            <div class="flex flex-wrap items-center gap-2 text-base md:text-lg">
+              <span class="font-medium text-primary">{entry.company}</span>
+              <span class="text-neutral" aria-hidden="true">
+                •
+              </span>
+              <time class="text-neutral">
+                {entry.startDate} – {entry.endDate || t("cv.present")}
+              </time>
+            </div>
+          </div>
+
+          {/* Description */}
+          <p class="mb-4 leading-relaxed text-base-content/90">
+            {entry.description}
+          </p>
+
+          {/* Technologies/Skills tags */}
+          {entry.technologies && entry.technologies.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {entry.technologies.map((tech) => (
+                <span class="inline-flex items-center rounded-md bg-base-200 px-3 py-1 text-sm font-medium text-base-content ring-1 ring-inset ring-base-300 transition-colors hover:bg-primary/10 hover:ring-primary/30">
+                  {tech}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  /* Subtle glow effect on timeline dots on hover */
+  article:hover div[aria-hidden="true"].rounded-full {
+    box-shadow: 0 0 12px oklch(var(--color-primary) / 0.5);
+  }
+</style>

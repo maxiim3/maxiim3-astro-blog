@@ -1,0 +1,72 @@
+---
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+import LogoBrand from "../ui/atoms/logo-brand.astro";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { href: `/${lang}`, label: t("nav.home"), icon: "home" },
+  { href: `/${lang}/blog`, label: t("nav.blog"), icon: "file-text" },
+  { href: `/${lang}/projects`, label: t("nav.projects"), icon: "folder" },
+  { href: `/${lang}/cv`, label: t("nav.cv"), icon: "user" },
+  { href: `/${lang}/tree`, label: t("nav.links"), icon: "link" },
+];
+
+function isActive(href: string): boolean {
+  const path = currentPath.replace(/\/$/, "");
+  const h = href.replace(/\/$/, "");
+  if (h === `/${lang}`) return path === h;
+  return path.startsWith(h);
+}
+---
+
+<nav class="sticky top-0 flex w-full flex-col items-end gap-8 pt-4 pr-4">
+  <a href={`/${lang}`} class="mb-4">
+    <LogoBrand />
+  </a>
+  <LanguageSwitcher />
+  <div class="flex flex-col gap-0.5">
+    {navItems.map((item) => {
+      const active = isActive(item.href);
+      return (
+        <a
+          href={item.href}
+          class:list={[
+            "btn btn-ghost justify-start gap-3",
+            active ? "font-bold" : "font-light"
+          ]}
+        >
+          {item.icon === "home" && (
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          )}
+          {item.icon === "file-text" && (
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          )}
+          {item.icon === "folder" && (
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+          )}
+          {item.icon === "user" && (
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          )}
+          {item.icon === "link" && (
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+          )}
+          <span class="text-base">{item.label}</span>
+        </a>
+      );
+    })}
+  </div>
+</nav>

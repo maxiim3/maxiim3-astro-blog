@@ -1,24 +1,10 @@
 ---
-import AppLayout from "../layouts/AppLayout.astro";
----
+/**
+ * Root redirect page
+ * Redirects to the default locale (/en/)
+ */
+import { defaultLang } from "../i18n/ui";
 
-<AppLayout>
-  <main class="self-start h-full text-center">
-    <h1 class="text-accent">JavaScript et cetera</h1>
-    <article class="space-y-2 text-pretty">
-      <p>
-        Welcome to <strong>JS etc.</strong> a blog where we discuss about JavaScript
-        ecosystem.
-      </p>
-      <p>
-        You will find article, research, experimentations with JavaScript and
-        its framwework, such as <strong>React</strong>, <strong>Vue</strong> or
-        <strong>Svelte</strong>.
-      </p>
-      <p>
-        This blog is built with Astro, allowing us to include different
-        frameworks.
-      </p>
-    </article>
-  </main>
-</AppLayout>
+// Redirect to default locale
+return Astro.redirect(`/${defaultLang}/`);
+---

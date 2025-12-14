@@ -1,36 +1,45 @@
 ---
 import HeadMetadata from "../components/ui/head-metadata.astro";
-import Footer from "../components/ui/footer.astro";
-import NavBar from "../components/ui/navbar/navbar.astro";
+import LeftSidebar from "../components/layout/LeftSidebar.astro";
+import RightSidebar from "../components/layout/RightSidebar.astro";
+import MobileNav from "../components/layout/MobileNav.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import { getLangFromUrl } from "../i18n";
 
 interface Props {
   title?: string;
   description?: string;
 }
 
-const { title = SITE_TITLE, description = SITE_DESCRIPTION } =
-  Astro.props as Props;
+const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <HeadMetadata title={title} description={description} />
   </head>
-  <body>
-    <NavBar />
-    <main class="main">
-      <article>
-        <div class="prose mx-auto w-[720px] max-w-[calc(100%-2em)] p-[1em]">
-          <div class="title mb-[1em] px-0 py-[1em] text-center leading-none">
-            <h1 class="mb-[0.5em]">{title}</h1>
-            <hr />
-          </div>
-          <slot />
-        </div>
-      </article>
-    </main>
-    <Footer />
+  <body class="bg-base-100 min-h-screen">
+    <!-- 3-column flexbox layout centered on page -->
+    <div class="flex min-h-lvh w-lvw justify-center overflow-x-hidden bg-base-100">
+      <!-- Left Sidebar: Navigation - Hidden on mobile -->
+      <aside class="max-md:hidden max-w-xs flex-1">
+        <LeftSidebar />
+      </aside>
+
+      <!-- Main Content: Max width 680px with borders, padding for mobile nav -->
+      <main class="border-base-300 max-w-[680px] flex-1 border-x md:min-w-[38rem] pb-20 md:pb-0">
+        <slot />
+      </main>
+
+      <!-- Right Sidebar: Desktop only -->
+      <aside class="hidden lg:block max-w-xs flex-1">
+        <RightSidebar />
+      </aside>
+    </div>
+
+    <!-- Mobile Navigation: Bottom bar visible only on mobile -->
+    <MobileNav />
   </body>
 </html>

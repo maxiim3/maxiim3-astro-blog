@@ -1,0 +1,214 @@
+---
+/**
+ * FilterTabs component
+ * Provides filter tabs for different content types (All, Vue, React, Svelte, etc.)
+ * Active state uses gold accent from Deep Space theme
+ */
+
+import { getCollection } from "astro:content";
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Get all blog posts and projects to extract unique framework tags
+const blogPosts = await getCollection("blog");
+const projects = await getCollection("projects");
+
+// Extract framework-related tags (common frameworks)
+const allContent = [...blogPosts, ...projects];
+const allTags = new Set<string>();
+
+allContent.forEach((item) => {
+  if (item.data.tags) {
+    item.data.tags.forEach((tag) => allTags.add(tag.toLowerCase()));
+  }
+  // For projects, also check stack
+  if ("stack" in item.data && item.data.stack) {
+    item.data.stack.forEach((tech) => allTags.add(tech.toLowerCase()));
+  }
+});
+
+// Define framework filters (only show if they exist in content)
+const frameworkFilters = ["vue", "react", "svelte", "astro"];
+const availableFilters = frameworkFilters.filter((fw) => allTags.has(fw));
+
+// Filter configuration
+interface Filter {
+  id: string;
+  label: string;
+}
+
+const filters: Filter[] = [
+  { id: "all", label: t("sidebar.filter.all") },
+  ...availableFilters.map((fw) => ({
+    id: fw,
+    label: fw.charAt(0).toUpperCase() + fw.slice(1),
+  })),
+];
+---
+
+<div class="filter-container rounded-lg bg-base-200 p-4">
+  <h3 class="text-sm font-semibold text-base-content/60 mb-3">
+    {t("sidebar.filter.title")}
+  </h3>
+
+  <div class="flex flex-wrap gap-2" role="tablist" aria-label={t("sidebar.filter.title")}>
+    {
+      filters.map((filter, index) => (
+        <button
+          type="button"
+          role="tab"
+          aria-selected={index === 0 ? "true" : "false"}
+          aria-controls="content-list"
+          data-filter={filter.id}
+          class:list={[
+            "filter-tab px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200",
+            "focus:outline-none focus:ring-2 focus:ring-primary/50",
+            {
+              "bg-primary text-primary-content shadow-md": index === 0,
+              "bg-base-300 text-base-content/70 hover:bg-base-300/70 hover:text-base-content":
+                index !== 0,
+            },
+          ]}
+        >
+          {filter.label}
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  /**
+   * Client-side filter functionality
+   * Filters articles based on selected tab
+   */
+
+  function initFilters() {
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    if (!filterButtons.length) return;
+
+    // Handle filter click
+    const handleFilterClick = (e: Event) => {
+      const button = e.currentTarget as HTMLButtonElement;
+      const filterId = button.getAttribute('data-filter');
+      if (!filterId) return;
+
+      // Update active state
+      filterButtons.forEach((btn) => {
+        const isActive = btn === button;
+        btn.setAttribute('aria-selected', isActive.toString());
+
+        if (isActive) {
+          btn.classList.remove(
+            'bg-base-300',
+            'text-base-content/70',
+            'hover:bg-base-300/70',
+            'hover:text-base-content'
+          );
+          btn.classList.add('bg-primary', 'text-primary-content', 'shadow-md');
+        } else {
+          btn.classList.remove('bg-primary', 'text-primary-content', 'shadow-md');
+          btn.classList.add(
+            'bg-base-300',
+            'text-base-content/70',
+            'hover:bg-base-300/70',
+            'hover:text-base-content'
+          );
+        }
+      });
+
+      // Filter articles
+      filterArticles(filterId);
+
+      // Dispatch custom event
+      window.dispatchEvent(
+        new CustomEvent('filter-change', {
+          detail: { filter: filterId }
+        })
+      );
+    };
+
+    // Filter articles based on selected filter
+    const filterArticles = (filterId: string) => {
+      const articles = document.querySelectorAll('[data-article]');
+      let visibleCount = 0;
+
+      articles.forEach((article) => {
+        const tags = article.getAttribute('data-tags')?.toLowerCase() || '';
+        const stack = article.getAttribute('data-stack')?.toLowerCase() || '';
+        const allTags = `${tags} ${stack}`;
+
+        // Show all if "all" filter is selected
+        const matches = filterId === 'all' || allTags.includes(filterId.toLowerCase());
+
+        if (matches) {
+          // Only show if not hidden by search
+          if (!article.classList.contains('search-hidden')) {
+            article.classList.remove('hidden');
+            visibleCount++;
+          }
+        } else {
+          article.classList.add('hidden');
+        }
+      });
+
+      // Update visible count
+      window.dispatchEvent(
+        new CustomEvent('filter-update', {
+          detail: { filter: filterId, visibleCount }
+        })
+      );
+    };
+
+    // Attach event listeners
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', handleFilterClick);
+    });
+
+    // Listen to search events to coordinate with search filter
+    window.addEventListener('search-update', ((e: CustomEvent) => {
+      const articles = document.querySelectorAll('[data-article]');
+
+      articles.forEach((article) => {
+        if (article.classList.contains('hidden')) {
+          article.classList.add('search-hidden');
+        } else {
+          article.classList.remove('search-hidden');
+        }
+      });
+    }) as EventListener);
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFilters);
+  } else {
+    initFilters();
+  }
+
+  // Re-initialize on page navigation (for view transitions)
+  document.addEventListener('astro:page-load', initFilters);
+</script>
+
+<style>
+  /* Smooth transitions for filter tabs */
+  .filter-tab {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .filter-tab:hover {
+    transform: translateY(-1px);
+  }
+
+  .filter-tab:active {
+    transform: translateY(0);
+  }
+
+  /* Active filter gets a subtle gold glow */
+  .filter-tab[aria-selected="true"] {
+    box-shadow: 0 2px 8px oklch(var(--color-primary) / 0.2);
+  }
+</style>

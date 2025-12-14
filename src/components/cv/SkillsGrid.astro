@@ -1,0 +1,93 @@
+---
+/**
+ * SkillsGrid Component
+ * Visual skills display with proficiency levels
+ * Organized by categories with gold accent highlights
+ */
+import { useTranslations, type Locale } from "../../i18n";
+
+export interface Skill {
+  name: string;
+  proficiency: number; // 1-5 scale
+}
+
+export interface SkillCategory {
+  category: string;
+  skills: Skill[];
+}
+
+interface Props {
+  lang: Locale;
+  categories: SkillCategory[];
+}
+
+const { lang, categories } = Astro.props;
+const t = useTranslations(lang);
+
+// Helper function to get proficiency label
+function getProficiencyLabel(level: number): string {
+  const labels = ["Beginner", "Intermediate", "Proficient", "Advanced", "Expert"];
+  return labels[level - 1] || labels[0];
+}
+---
+
+<div class="grid gap-6 md:gap-8">
+  {
+    categories.map((categoryData) => (
+      <div class="rounded-lg border border-base-300 bg-base-100 p-5 md:p-6">
+        {/* Category header */}
+        <h3
+          class="mb-5 text-lg font-semibold uppercase tracking-wider text-primary md:text-xl"
+          style="font-family: 'Space Grotesk', sans-serif;"
+        >
+          {categoryData.category}
+        </h3>
+
+        {/* Skills grid */}
+        <div class="grid gap-4 sm:grid-cols-2">
+          {categoryData.skills.map((skill) => (
+            <div class="space-y-2">
+              {/* Skill name and proficiency level */}
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-base-content">{skill.name}</span>
+                <span class="text-sm text-neutral">
+                  {skill.proficiency}/5
+                </span>
+              </div>
+
+              {/* Visual proficiency bar */}
+              <div class="h-2 overflow-hidden rounded-full bg-base-200">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
+                  style={`width: ${(skill.proficiency / 5) * 100}%`}
+                  role="progressbar"
+                  aria-valuenow={skill.proficiency}
+                  aria-valuemin={0}
+                  aria-valuemax={5}
+                  aria-label={`${skill.name}: ${getProficiencyLabel(skill.proficiency)}`}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  /* Subtle glow animation on proficiency bars */
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 8px oklch(var(--color-primary) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 16px oklch(var(--color-primary) / 0.5);
+    }
+  }
+
+  div:hover .bg-gradient-to-r {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+</style>

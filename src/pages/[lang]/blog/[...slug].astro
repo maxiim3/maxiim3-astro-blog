@@ -1,0 +1,175 @@
+---
+/**
+ * Blog article page with i18n support
+ * Displays full blog post content with hero image, metadata, and tags
+ */
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import AppLayout from "../../../layouts/AppLayout.astro";
+import {
+  useTranslations,
+  getLangFromUrl,
+  getI18nStaticPaths,
+  formatDate,
+  type Locale,
+} from "../../../i18n";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return getI18nStaticPaths((locale) =>
+    posts.map((post) => ({
+      params: { lang: locale, slug: post.id },
+      props: { post },
+    }))
+  );
+}
+
+type Props = {
+  post: CollectionEntry<"blog">;
+};
+
+const { post } = Astro.props;
+const lang = getLangFromUrl(Astro.url) as Locale;
+const t = useTranslations(lang);
+
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate, heroImage, tags } = post.data;
+const formattedDate = formatDate(pubDate, lang);
+const formattedUpdatedDate = updatedDate ? formatDate(updatedDate, lang) : null;
+---
+
+<AppLayout title={title} description={description}>
+  <article class="p-0">
+    <!-- Back link -->
+    <div class="p-4 border-b border-base-300">
+      <a
+        href={`/${lang}/blog`}
+        class="inline-flex items-center gap-2 text-base-content/70 hover:text-warning transition-colors duration-200"
+      >
+        <span aria-hidden="true">←</span>
+        <span>{t("common.back")}</span>
+      </a>
+    </div>
+
+    <!-- Hero Image -->
+    {
+      heroImage && (
+        <div class="w-full">
+          <img
+            src={heroImage}
+            alt={title}
+            class="w-full h-auto max-h-[400px] object-cover"
+          />
+        </div>
+      )
+    }
+
+    <!-- Article Header -->
+    <header class="p-6 border-b border-base-300">
+      <div class="max-w-3xl mx-auto">
+        <h1
+          class="text-4xl font-bold text-base-content mb-4"
+          style="font-family: 'Space Grotesk', sans-serif;"
+        >
+          {title}
+        </h1>
+        <p class="text-xl text-base-content/80 mb-4">{description}</p>
+
+        <!-- Metadata -->
+        <div class="flex flex-wrap items-center gap-4 text-sm text-base-content/60">
+          <time datetime={pubDate.toISOString()} class="flex items-center gap-1">
+            <span aria-hidden="true">📅</span>
+            <span>
+              {t("blog.publishedOn")} {formattedDate}
+            </span>
+          </time>
+          {
+            formattedUpdatedDate && (
+              <time
+                datetime={updatedDate!.toISOString()}
+                class="flex items-center gap-1 italic"
+              >
+                <span aria-hidden="true">✏️</span>
+                <span>
+                  {t("blog.updatedOn")} {formattedUpdatedDate}
+                </span>
+              </time>
+            )
+          }
+        </div>
+
+        <!-- Tags -->
+        {
+          tags && tags.length > 0 && (
+            <div class="flex flex-wrap gap-2 mt-4">
+              {tags.map((tag) => (
+                <span class="badge badge-outline badge-lg">{tag}</span>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </header>
+
+    <!-- Article Content -->
+    <div class="prose prose-lg max-w-3xl mx-auto p-6">
+      <Content />
+    </div>
+
+    <!-- Back to blog link at bottom -->
+    <div class="p-6 border-t border-base-300">
+      <a
+        href={`/${lang}/blog`}
+        class="inline-flex items-center gap-2 text-base-content/70 hover:text-warning transition-colors duration-200"
+      >
+        <span aria-hidden="true">←</span>
+        <span>{t("blog.allPosts")}</span>
+      </a>
+    </div>
+  </article>
+</AppLayout>
+
+<style is:global>
+  /* Ensure prose styles work well with Deep Space theme */
+  .prose {
+    color: oklch(var(--bc));
+  }
+
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    color: oklch(var(--bc));
+    font-family: "Space Grotesk", sans-serif;
+  }
+
+  .prose a {
+    color: oklch(var(--wa));
+    text-decoration: underline;
+  }
+
+  .prose a:hover {
+    color: oklch(var(--wa) / 0.8);
+  }
+
+  .prose code {
+    background-color: oklch(var(--b2));
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+
+  .prose pre {
+    background-color: oklch(var(--b2));
+    border: 1px solid oklch(var(--bc) / 0.1);
+  }
+
+  .prose blockquote {
+    border-left-color: oklch(var(--wa));
+    color: oklch(var(--bc) / 0.8);
+  }
+
+  .prose img {
+    border-radius: 0.5rem;
+  }
+</style>
