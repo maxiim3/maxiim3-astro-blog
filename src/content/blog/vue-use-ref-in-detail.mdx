@@ -1,0 +1,42 @@
+---
+title: "Vue useRef in detail (Proxies)"
+description: "Let's rebuild vue's useRef using JS Proxies"
+pubDate: "May 18 2025"
+---
+
+In this article we will see in detail how to rebuild Vue.js useRef using Javascript Proxies.
+
+- How does Vue handle state ?
+- How does Vue udpate the DOM ?
+- What is a Proxy ?
+- An attempte to implement useRef
+- Resources (videos, articles)
+
+```js
+function useRef(initialValue) {
+  const _value = {
+    value: initialValue ?? undefined,
+  };
+
+  return new Proxy(_value, {
+    get(target, prop) {
+      if (prop === "value") {
+        return target[prop];
+      } else console.error("prop doesnot exist");
+    },
+    set(target, prop, value) {
+      if (prop === "value") {
+        target[prop] = value;
+        return true;
+      }
+      console.error("prop doesnot exist");
+      return false;
+    },
+  });
+}
+```
+
+If you like this article, don't hesitate to share it on social media and tag/follow me:
+
+- [𝕏/@max_webstudio](https://x.com/max_webstudio)
+- [🦋 bsky/@maxiim3.bsky.social](https://bsky.app/profile/maxiim3.bsky.social)

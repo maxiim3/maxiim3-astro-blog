@@ -1,0 +1,11 @@
+- [ ] post: finnish React useState basics
+- [ ] post: rebuilding useState (postpone for later)
+- [ ] post: Rebuilding useRef with JS Proxies
+      = [ ] post all articles to my bsky-clone website.
+- [ ] post: customer pointer (React)
+- [ ] post: Button animation -> Hover fill then bounce (React)
+- [ ] post: Line table animation (Vue)
+- [ ] rules: Add a variable to make the post 'draft' or 'online'
+- [ ] rules: Add a system of tags
+- [ ] rules: Create a layout for posts to wrap them with like button to social media
+- [ ] post-idea: investigate on how to rebuild a small virtual dom.

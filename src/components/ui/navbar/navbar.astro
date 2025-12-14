@@ -1,10 +1,27 @@
 ---
-const today = new Date();
+import NavBarLink from "./navbar-link.astro";
+import { SITE_TITLE } from "../../../consts";
+import Logo from "./../../ui/atoms/logo-brand.astro";
 ---
 
-<footer>
-  &copy; {today.getFullYear()} Your name here. All rights reserved.
-  <div class="social-links">
+<header
+  class="float-left fixed border-r h-lvh p-2 sm:px-4 md:px-8 flex flex-col"
+>
+  <nav>
+    <h2>
+      <a href="/">
+        <Logo />
+        <span class="sr-only">{SITE_TITLE}</span>
+      </a>
+    </h2>
+    <div class="internal-links flex flex-col md:gap-8">
+      <NavBarLink href="/">Home</NavBarLink>
+      <NavBarLink href="/blog">Blog</NavBarLink>
+      <NavBarLink href="/about">About</NavBarLink>
+      <NavBarLink href="/lab">🔬 Lab</NavBarLink>
+    </div>
+  </nav>
+  <div class="social-links mt-auto">
     <a href="https://bsky.app/profile/maxiim3.bsky.social" target="_blank">
       <span class="sr-only">Follow Maxime on Bluesky</span>
       <svg
@@ -13,8 +30,8 @@ const today = new Date();
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         id="Bluesky--Streamline-Simple-Icons"
-        height="32"
-        width="32"
+        height="24"
+        width="24"
         astro-icon="social/bluesky"
       >
         <desc> Bluesky Streamline Icon: https://streamlinehq.com </desc>
@@ -32,8 +49,8 @@ const today = new Date();
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
         id="X--Streamline-Simple-Icons"
-        width="32"
-        height="32"
+        width="24"
+        height="24"
       >
         <desc> X Streamline Icon: https://streamlinehq.com </desc>
         <title>X</title>
@@ -48,8 +65,8 @@ const today = new Date();
       <svg
         viewBox="0 0 16 16"
         aria-hidden="true"
-        width="32"
-        height="32"
+        width="24"
+        height="24"
         astro-icon="social/github"
         ><path
           fill="currentColor"
@@ -58,25 +75,4 @@ const today = new Date();
       >
     </a>
   </div>
-</footer>
-<style>
-  footer {
-    padding: 2em 1em 6em 1em;
-    background: linear-gradient(var(--gray-gradient)) no-repeat;
-    color: rgb(var(--gray));
-    text-align: center;
-  }
-  .social-links {
-    display: flex;
-    justify-content: center;
-    gap: 1em;
-    margin-top: 1em;
-  }
-  .social-links a {
-    text-decoration: none;
-    color: rgb(var(--gray));
-  }
-  .social-links a:hover {
-    color: rgb(var(--gray-dark));
-  }
-</style>
+</header>

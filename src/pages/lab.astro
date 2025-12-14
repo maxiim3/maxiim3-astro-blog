@@ -1,0 +1,10 @@
+---
+import { ButtonWithDrawer } from "../components/framework/react-ui/react-button";
+import AppLayout from "../layouts/AppLayout.astro";
+---
+
+<AppLayout>
+  <h1 class="text-accent">JavaScript et cetera</h1>
+  <h2>Astro Lab</h2>
+  <ButtonWithDrawer client:only="react" />
+</AppLayout>

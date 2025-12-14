@@ -1,0 +1,36 @@
+---
+import HeadMetadata from "../components/ui/head-metadata.astro";
+import Footer from "../components/ui/footer.astro";
+import NavBar from "../components/ui/navbar/navbar.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = SITE_TITLE, description = SITE_DESCRIPTION } =
+  Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <HeadMetadata title={title} description={description} />
+  </head>
+  <body>
+    <NavBar />
+    <main class="main">
+      <article>
+        <div class="prose mx-auto w-[720px] max-w-[calc(100%-2em)] p-[1em]">
+          <div class="title mb-[1em] px-0 py-[1em] text-center leading-none">
+            <h1 class="mb-[0.5em]">{title}</h1>
+            <hr />
+          </div>
+          <slot />
+        </div>
+      </article>
+    </main>
+    <Footer />
+  </body>
+</html>
