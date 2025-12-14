@@ -1,0 +1,1 @@
+- don't run lint or build command

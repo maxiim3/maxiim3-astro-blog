@@ -1,5 +1,6 @@
 ---
 import HeadMetadata from "../components/ui/head-metadata.astro";
+import Footer from "../components/ui/footer.astro";
 import LeftSidebar from "../components/layout/LeftSidebar.astro";
 import RightSidebar from "../components/layout/RightSidebar.astro";
 import MobileNav from "../components/layout/MobileNav.astro";
@@ -31,6 +32,7 @@ const lang = getLangFromUrl(Astro.url);
       <!-- Main Content: Max width 680px with borders, padding for mobile nav -->
       <main class="border-base-300 max-w-[680px] flex-1 border-x md:min-w-[38rem] pb-20 md:pb-0">
         <slot />
+        <Footer />
       </main>
 
       <!-- Right Sidebar: Desktop only -->

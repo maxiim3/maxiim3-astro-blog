@@ -3,7 +3,8 @@ const today = new Date();
 ---
 
 <footer>
-  &copy; {today.getFullYear()} Your name here. All rights reserved.
+  <p class="ai-disclosure">AI-assisted writing. Original ideas and content by Maxime.</p>
+  <p>&copy; {today.getFullYear()} Maxime. All rights reserved.</p>
   <div class="social-links">
     <a href="https://bsky.app/profile/maxiim3.bsky.social" target="_blank">
       <span class="sr-only">Follow Maxime on Bluesky</span>
@@ -61,10 +62,13 @@ const today = new Date();
 </footer>
 <style>
   footer {
-    padding: 2em 1em 6em 1em;
-    /* background: linear-gradient(var(--gray-gradient)) no-repeat; */
-    /* color: rgb(var(--gray)); */
+    padding: 2em 1em;
     text-align: center;
+  }
+  .ai-disclosure {
+    font-size: 0.875em;
+    opacity: 0.7;
+    margin-bottom: 0.5em;
   }
   .social-links {
     display: flex;

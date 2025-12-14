@@ -13,6 +13,9 @@ export {
   getI18nStaticPaths,
   formatDate,
   getAlternateLocale,
+  getPostLang,
+  getPostSlug,
+  filterPostsByLang,
   type Locale,
   type TranslationKey,
 } from "./utils";

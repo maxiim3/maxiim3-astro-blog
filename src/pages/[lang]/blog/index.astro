@@ -11,6 +11,7 @@ import {
   useTranslations,
   getLangFromUrl,
   getI18nStaticPaths,
+  filterPostsByLang,
   type Locale,
 } from "../../../i18n";
 
@@ -32,6 +33,9 @@ const posts = (await getCollection("blog"))
   .filter((post) => post.data.pubDate.getTime() <= today.getTime())
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
+// Filter posts by current language
+const localizedPosts = filterPostsByLang(posts, lang);
+
 const pageTitle = t("blog.title");
 const pageDescription = t("blog.description");
 ---
@@ -51,9 +55,9 @@ const pageDescription = t("blog.description");
 
     <!-- Blog Posts Feed (single column, style tweets) -->
     {
-      posts.length > 0 ? (
+      localizedPosts.length > 0 ? (
         <div class="flex flex-col divide-y divide-base-300">
-          {posts.map((post) => (
+          {localizedPosts.map((post) => (
             <ArticleCard post={post} lang={lang} />
           ))}
         </div>

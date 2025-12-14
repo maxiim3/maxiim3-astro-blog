@@ -2,6 +2,7 @@
  * i18n utility functions for Astro 5
  */
 
+import type { CollectionEntry } from "astro:content";
 import { ui, defaultLang } from "./ui";
 
 export type Locale = keyof typeof ui;
@@ -105,4 +106,34 @@ export function formatDate(date: Date, lang: Locale): string {
  */
 export function getAlternateLocale(currentLocale: Locale): Locale {
   return currentLocale === "en" ? "fr" : "en";
+}
+
+/**
+ * Extract language from a blog post's id
+ * Posts are organized as: {lang}/{slug}.md(x)
+ */
+export function getPostLang(postId: string): Locale {
+  const [lang] = postId.split("/");
+  if (isValidLocale(lang)) {
+    return lang;
+  }
+  return defaultLang;
+}
+
+/**
+ * Extract the slug portion from a post id (without language prefix)
+ */
+export function getPostSlug(postId: string): string {
+  const parts = postId.split("/");
+  return parts.slice(1).join("/");
+}
+
+/**
+ * Filter blog posts by language
+ */
+export function filterPostsByLang(
+  posts: CollectionEntry<"blog">[],
+  lang: Locale
+): CollectionEntry<"blog">[] {
+  return posts.filter((post) => getPostLang(post.id) === lang);
 }
